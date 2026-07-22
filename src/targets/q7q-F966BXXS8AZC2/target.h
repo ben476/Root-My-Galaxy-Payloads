@@ -31,7 +31,7 @@
 #endif
 #ifndef BUILD_FINGERPRINT
 #define BUILD_FINGERPRINT \
-  "samsung/q7qxxx/q7q:16/BP2A.250605.031.A3/F966BXXS8AZC2_OXM8AZB6:user/release-keys"
+  "samsung/q7qxxx/qssi_64:16/BP2A.250605.031.A3/F966BXXS8AZC2:user/release-keys"
 #endif
 
 // ─── Memory map ────────────────────────────────────────────────────────────
