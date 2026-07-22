@@ -58,7 +58,7 @@
       "kernelVersion": "Linux version 6.6.57-android15-8-31566393-abogkiF966BXXS8AZC2-4k (kleaf@build-host) (Android (11368308, +pgo, +bolt, +lto, +mlgo, based on r510928) clang version 18.0.0 (https://android.googlesource.com/toolchain/llvm-project 477610d4d0d988e69dbc3fae4fe86bff3f07f2b5), LLD 18.0.0) #1 SMP PREEMPT Fri Mar  6 02:01:14 UTC 2026",
       "kernelBuildVersion": "#1 SMP PREEMPT Fri Mar  6 02:01:14 UTC 2026",
       "buildDisplay": "BP2A.250605.031.A3.F966BXXS8AZC2",
-      "buildFingerprint": "samsung/q7qxxx/qssi_64:16/BP2A.250605.031.A3/F966BXXS8AZC2:user/release-keys",
+      "buildFingerprint": "samsung/q7qxxx/q7q:16/BP2A.250605.031.A3/F966BXXS8AZC2_OXM8AZB6:user/release-keys",
       "sdk": 36,
       "abi": "arm64-v8a",
       "pageSize": 4096,

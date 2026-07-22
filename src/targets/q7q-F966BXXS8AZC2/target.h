@@ -31,7 +31,7 @@
 #endif
 #ifndef BUILD_FINGERPRINT
 #define BUILD_FINGERPRINT \
-  "samsung/q7qxxx/qssi_64:16/BP2A.250605.031.A3/F966BXXS8AZC2:user/release-keys"
+  "samsung/q7qxxx/q7q:16/BP2A.250605.031.A3/F966BXXS8AZC2_OXM8AZB6:user/release-keys"
 #endif
 
 // ─── Memory map ────────────────────────────────────────────────────────────
@@ -192,9 +192,12 @@
   (KIMAGE_TEXT_BASE + SLIDE_SYSCTL_BOOTID_OFF)
 
 // ─── Page layout offsets ───────────────────────────────────────────────────
-#define LOCK_OFF         0x2210
-#define W0_OFF           0x2350
-#define FOPS_OFF         0x2000
+// [DEVICE] Derived from on-device testing (CyberMeowfia q7q target).
+//          These differ from pa3q — LOCK at 0x1350 (not 0x2210),
+//          W0 at 0x2220 (not 0x2350), FOPS at 0x1000 (not 0x2000).
+#define LOCK_OFF         0x1350
+#define W0_OFF           0x2220
+#define FOPS_OFF         0x1000
 #define SCRATCH_OFF      0x3000
 #define RIGHT_OFF        0x4440
 #define LEFT_OFF         0x5550
