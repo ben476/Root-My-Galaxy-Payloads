@@ -130,6 +130,12 @@ __attribute__((constructor)) static void load(void) {
              attempt_timeout_sec);
 
   for (int attempt = 1; attempt <= max_attempts; attempt++) {
+    if (access("/data/local/tmp/temp_su.sock", F_OK) == 0) {
+      pr_success("root socket present at attempt %d/%d, stopping "
+                 "supervisor to prevent stale oracle pipe reads\n",
+                 attempt, max_attempts);
+      return;
+    }
     int delay_usec = attempt_delay_usec(base_delay, attempt);
     pid_t child = SYSCHK(fork());
     if (child == 0) {
