@@ -286,6 +286,42 @@ add  x19, x8, x9
 blr  x19
 ```
 
+### Qualcomm targets (ABL/XBL, no sboot)
+
+The sboot method above does not exist on Qualcomm devices, and the GKI boot
+header carries `kernel_addr = 0` ("bootloader chooses"), so the Image header
+does not reveal the load address either. **Never** infer it from the DRAM-base
+convention: on hypervisor targets the first megabytes of DRAM are owned by
+firmware. Check the DTB `reserved-memory` node first — a
+`gunyah_hyp_region@80000000` entry means the kernel cannot be at DRAM base.
+
+Derive the real value with one of these, in order of preference:
+
+1. `/proc/iomem` on the live device — the "Kernel code" range start is the
+   physical load address (needs a shell that can see real addresses).
+2. Any kernel panic dump — the `show_swapper_pgtable` line prints
+   `pgdp=<phys>`, the physical address of `swapper_pg_dir`. Compute:
+
+   ```text
+   P0_KERNEL_PHYS_LOAD = pgdp - (swapper_pg_dir - _text)
+   ```
+
+   with both symbols taken from the target `vmlinux.nm`. This is exact and is
+   how the q7q value `0xa8000000` was confirmed
+   (`pgdp=0xa9d8b000` − `0x1d8b000`).
+3. The ABL "Final RAM Partitions" log in `last_kmsg` — the kernel must land in
+   one of the "Add Base … Available" spans; cross-check the candidate against
+   it.
+
+A wrong anchor does not fail cleanly: the P0 oracle probe read targets
+`P0_DATA_ALIAS_CONST(KIMAGE_TEXT_BASE) + P0_ORACLE_PROBE_OFFSET`, and if that
+IPA has no linear-map alias (reserved/unmapped region), `pipe_read` takes a
+level-2 translation fault at EL1 and the kernel panics — see
+[`SM-F966B-F966BXXS8AZC2.md`](SM-F966B-F966BXXS8AZC2.md) "Kernel crash — root
+cause". Verify the anchor before the first on-device run, and verify that
+`P0_KERNEL_PHYS_LOAD + P0_ORACLE_PROBE_OFFSET` falls inside an available,
+linear-mapped RAM span.
+
 ## 5. Derive slide data and P0 fingerprints
 
 ### Trace event ID and worker return address

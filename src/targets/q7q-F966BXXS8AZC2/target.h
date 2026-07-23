@@ -37,10 +37,21 @@
 // ─── Memory map ────────────────────────────────────────────────────────────
 // [ELF]   KIMAGE_TEXT_BASE — first symbol in kallsyms (_text).
 #define KIMAGE_TEXT_BASE 0xffffffc080000000ULL
-// [IMGHDR] text_offset=0x0 → P0_KERNEL_PHYS_LOAD = P0_PHYS_OFFSET + 0
+// [IMGHDR] text_offset=0x0 → kernel VA tracks the physical load address.
 #define P0_PAGE_OFFSET 0xffffff8000000000ULL
 #define P0_PHYS_OFFSET 0x80000000ULL
-#define P0_KERNEL_PHYS_LOAD 0x80000000ULL
+// [PANIC] 0xa8000000, NOT the 0x80000000 DRAM-base convention. Proof: the
+//         2026-07-23 oracle panic dump reports pgdp=0xa9d8b000 (physical
+//         address of swapper_pg_dir); swapper_pg_dir sits at image offset
+//         0x1d8b000 (vmlinux.nm 0xffffffc081d8b000 - KIMAGE_TEXT_BASE), so
+//         phys_load = 0xa9d8b000 - 0x1d8b000 = 0xa8000000. Corroborated by
+//         the ABL "Final RAM Partitions" log ([0xa8000000,+0x10000000) is
+//         available RAM) and by DTB reserved-memory gunyah_hyp_region
+//         [0x80000000,+0xe00000), which rules out a DRAM-base load. Matches
+//         the pa3q targets on the same platform. Using 0x80000000 sent the
+//         P0 oracle probe read into the unmapped Gunyah region and panicked
+//         the kernel on every attempt.
+#define P0_KERNEL_PHYS_LOAD 0xa8000000ULL
 #define SKB_DATA_DELTA (-0xe80LL)
 
 #define SLIDE_FAKE_WAITER_PRIO 0
